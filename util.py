@@ -1,14 +1,17 @@
-import numpy as np
 import contextlib
-from typing import Union
-import pathlib
 import os
+import pathlib
+from typing import Union
+
 import astropy.units as u
+import numpy as np
+
 
 @np.vectorize
 def center_of_index(length: int) -> float:
     """given an array with extent length, what index hits the center of the array?"""
-    return (length-1)/2
+    return (length - 1) / 2
+
 
 def center_of_image(img: np.ndarray) -> tuple[float, float]:
     """in pixel coordinates, pixel center convention
@@ -22,6 +25,7 @@ def center_of_image(img: np.ndarray) -> tuple[float, float]:
     assert len(img.shape) == 2
     # xcenter, ycenter
     return tuple(center_of_index(img.shape)[::-1])
+
 
 @contextlib.contextmanager
 def work_in(path: Union[str, pathlib.Path]):
@@ -39,9 +43,9 @@ def work_in(path: Union[str, pathlib.Path]):
 
 
 pixel_count = 1024 * u.pixel
-pixel_scale = 0.004 * u.arcsec/u.pixel
+pixel_scale = 0.004 * u.arcsec / u.pixel
 
-max_pixel_coord = pixel_count - 1 * u.pixel #  size 1024 to max index 1023
+max_pixel_coord = pixel_count - 1 * u.pixel  # size 1024 to max index 1023
 
 
 # Writing these is probably responsible for a significant number of grey hairs on my part.
@@ -91,4 +95,4 @@ def flux_to_magnitude(flux):
 
 @np.vectorize
 def magnitude_to_flux(magnitude):
-    return 10**(-magnitude/2.5)
+    return 10 ** (-magnitude / 2.5)

@@ -1,23 +1,24 @@
 import multiprocessing
 import tempfile
-from typing import Callable, Tuple, Optional
-import anisocado
-from image_registration.fft_tools import upsample_image
-import scopesim
-from scopesim_templates import stars
-from photutils.centroids import centroid_quadratic
-from astropy.table import Table
-import appdirs
 from pathlib import Path
-from util import *
+from typing import Callable, Tuple, Optional
 
+import anisocado
+import appdirs
+import scopesim
+from astropy.table import Table
+from image_registration.fft_tools import upsample_image
+from photutils.centroids import centroid_quadratic
+from scopesim_templates import stars
+
+from util import *
 
 filter_name = 'MICADO/filters/TC_filter_K-cont.dat'
 
 # generators should be able to run in parallel but scopesim tends to lock up on the initialization
 scopesim_lock = multiprocessing.Lock()
 
-COLUMN_NAMES = ('x', 'y','m', 'f')
+COLUMN_NAMES = ('x', 'y', 'm', 'f')
 
 WORKING_DIR = Path(appdirs.user_cache_dir('scopesim_workspace'))
 
@@ -97,7 +98,6 @@ def setup_optical_train(psf_effect: Optional[scopesim.effects.Effect] = None,
             psf_effect = make_psf()
 
         micado.optics_manager.add_effect(psf_effect, ext=element_idx)
-
 
     # disable old psf
     # TODO - why is there no remove_effect with a similar interface?
@@ -195,5 +195,5 @@ if __name__ == '__main__':
 
     # discard overscan
     plt.imshow(image[10:-10, 10:-10], norm=LogNorm())
-    plt.plot(table['x']-10, table['y']-10, 'rx', ms=3)
+    plt.plot(table['x'] - 10, table['y'] - 10, 'rx', ms=3)
     plt.show()
