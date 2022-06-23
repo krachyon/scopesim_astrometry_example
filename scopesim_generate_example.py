@@ -10,9 +10,11 @@ from astropy.table import Table
 from image_registration.fft_tools import upsample_image
 from photutils.centroids import centroid_quadratic
 from scopesim_templates import stars
+from astropy.io import fits
 
 from util import *
 
+# couldn't figure out how to just say "K-band please". Is there a `get_avialable_filters()` somewhere?
 filter_name = 'MICADO/filters/TC_filter_K-cont.dat'
 
 # generators should be able to run in parallel but scopesim tends to lock up on the initialization
@@ -21,6 +23,8 @@ scopesim_lock = multiprocessing.Lock()
 COLUMN_NAMES = ('x', 'y', 'm', 'f')
 
 WORKING_DIR = Path(appdirs.user_cache_dir('scopesim_workspace'))
+
+OUTPUT_NAME = 'scopesim_astrometry_test.fits'
 
 
 def make_psf(psf_wavelength: float = 2.15,
@@ -34,7 +38,7 @@ def make_psf(psf_wavelength: float = 2.15,
     :param transform: function to apply to the psf array
     :return: effect object you can plug into OpticalTrain
     """
-    # this whole thing... There's bound to be a way cleaner alternative right?
+    # this whole thing... There's bound to be a way cleaner alternative without fits files, right?
 
     hdus = anisocado.misc.make_simcado_psf_file(
         [shift], [psf_wavelength], pixelSize=pixel_scale.value, N=N)
@@ -135,8 +139,7 @@ def scopesim_grid(N1d: int = 16,
                   perturbation: float = 15.,
                   magnitude=lambda N: N * [18],
                   psf_transform=lambda x: x,
-                  custom_subpixel_psf=None) \
-        -> Tuple[np.ndarray, Table]:
+                  custom_subpixel_psf=None) -> Tuple[np.ndarray, Table]:
     """
     Use scopesim to create a somewhat regular grid of stars because crowding is a pain to deal with
     :param N1d:  Grid of N1d x N1d Stars will be generated
@@ -169,6 +172,8 @@ def scopesim_grid(N1d: int = 16,
         detector = setup_optical_train(psf_effect=make_psf(transform=psf_transform))
 
     detector.observe(source, random_seed=seed, update=True)
+
+    # well, if we're just producing pixel-data with scopesim, why not return an array here?
     observed_image = detector.readout()[0][1].data
 
     # TODO magnitude to flux gives really weird answers. Is there a sane way to predict the total flux in the detector pixels
@@ -188,6 +193,8 @@ if __name__ == '__main__':
     #  that does not involve combing through the layers of rc dicts...
     with work_in(WORKING_DIR):
         image, table = scopesim_grid()
+
+    fits.ImageHDU(image).writeto(OUTPUT_NAME, overwrite=True)
 
     # show result
     import matplotlib.pyplot as plt

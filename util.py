@@ -27,6 +27,13 @@ def center_of_image(img: np.ndarray) -> tuple[float, float]:
     return tuple(center_of_index(img.shape)[::-1])
 
 
+def centered_grid(shape: tuple[int, int]) -> np.ndarray:
+    ystop, xstop = center_of_index(shape)
+    ystart, xstart = -ystop, -xstop
+
+    return np.mgrid[ystart:ystop:1j*shape[0], xstart:xstop:1j*shape[1]]
+
+
 @contextlib.contextmanager
 def work_in(path: Union[str, pathlib.Path]):
     """A context manager which changes the working directory to the given
@@ -42,6 +49,7 @@ def work_in(path: Union[str, pathlib.Path]):
         os.chdir(prev_cwd)
 
 
+# Can we get that from scopesim without crawling through dicts? How to deal with zoom in mode?
 pixel_count = 1024 * u.pixel
 pixel_scale = 0.004 * u.arcsec / u.pixel
 
