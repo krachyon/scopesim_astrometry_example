@@ -10,6 +10,7 @@ from matplotlib.colors import LogNorm
 import util
 from scopesim_generate_example import OUTPUT_NAME
 
+
 def getdata_safer(filename, *args, **kwargs):
     """
     Wrapper for astropy.io.fits.getdata to coerce data into float64 with native byteorder.
@@ -170,7 +171,7 @@ fitshape = 11
 
 # epsf_fit
 cutout_size = 21
-smoothing_kernel = 'quadratic'  # can be quadratic, quartic or custom array
+smoothing_kernel = 'quadratic'  # can be quadratic, quartic or custom array e.g. with util.make_gauss_kernel
 oversampling = 2
 epsf_iters = 5
 
@@ -192,7 +193,7 @@ minsep_fwhm = 0.3  # only find stars at least this*fwhm apart
 peakmax = 100_000  # only find stars below this pixel value to avoid saturated stars in photometry
 
 
-image_name = OUTPUT_NAME  # path to image you want to analyze
+image_name = OUTPUT_NAME.with_suffix('.fits')  # path to image you want to analyze
 # End parameters
 
 if __name__ == '__main__':

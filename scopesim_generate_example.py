@@ -24,7 +24,7 @@ COLUMN_NAMES = ('x', 'y', 'm', 'f')
 
 WORKING_DIR = Path(appdirs.user_cache_dir('scopesim_workspace'))
 
-OUTPUT_NAME = 'scopesim_astrometry_test.fits'
+OUTPUT_NAME = Path('scopesim_astrometry_test')
 
 
 def make_psf(psf_wavelength: float = 2.15,
@@ -194,7 +194,8 @@ if __name__ == '__main__':
     with work_in(WORKING_DIR):
         image, table = scopesim_grid()
 
-    fits.ImageHDU(image).writeto(OUTPUT_NAME, overwrite=True)
+    fits.ImageHDU(image).writeto(OUTPUT_NAME.with_suffix('.fits'), overwrite=True)
+    table.write(OUTPUT_NAME.with_suffix('.dat'), format='ascii.ecsv', overwrite=True)
 
     # show result
     import matplotlib.pyplot as plt

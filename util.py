@@ -5,6 +5,7 @@ from typing import Union
 
 import astropy.units as u
 import numpy as np
+from astropy.modeling.functional_models import Gaussian2D
 
 
 @np.vectorize
@@ -94,6 +95,16 @@ def pixel_to_mas(px_coord):
     coord_shifted = px_coord - max_pixel_coord / 2 + 0.5 * u.pixel
     mas = coord_shifted * pixel_scale
     return mas.value
+
+
+def make_gauss_kernel(σ=1.0, N=5):
+    """create a gaussian convolution kernel for the EPSF smoothing step"""
+    mod = Gaussian2D(x_stddev=σ, y_stddev=σ)
+
+    y, x = np.mgrid[-N / 2:N / 2:N * 1j, -N / 2:N / 2:N * 1j]
+    ev = mod(y, x)
+
+    return ev / np.sum(ev)
 
 
 @np.vectorize
