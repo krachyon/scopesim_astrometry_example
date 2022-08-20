@@ -1,0 +1,12 @@
+python>=3.9
+matplotlib
+astropy
+numpy
+scipy
+scopesim
+scopesim_templates
+appdirs
+multiprocess
+image_registration
+pytest
+photutils

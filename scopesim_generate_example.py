@@ -15,14 +15,15 @@ from astropy.io import fits
 from util import *
 
 # couldn't figure out how to just say "K-band please". Is there a `get_avialable_filters()` somewhere?
-filter_name = 'MICADO/filters/TC_filter_K-cont.dat'
 
 # generators should be able to run in parallel but scopesim tends to lock up on the initialization
 scopesim_lock = multiprocessing.Lock()
 
 COLUMN_NAMES = ('x', 'y', 'm', 'f')
 
-WORKING_DIR = Path(appdirs.user_cache_dir('scopesim_workspace'))
+WORKING_DIR = Path(appdirs.user_cache_dir('scopesim_workspace_new'))
+
+filter_name = 'Ks'
 
 OUTPUT_NAME = Path('scopesim_astrometry_test')
 
@@ -112,7 +113,7 @@ def setup_optical_train(psf_effect: Optional[scopesim.effects.Effect] = None,
     micado['micado_ncpas_psf'].include = False
 
     # TODO Apparently atmospheric dispersion is messed up. Ignore both dispersion and correction for now
-    if 'armazones_atmo_dispersion' in micado.effects:
+    if 'armazones_atmo_dispersion' in np.array(micado.effects['name']):
         micado['armazones_atmo_dispersion'].include = False
     micado['micado_adc_3D_shift'].include = False
 
@@ -128,9 +129,9 @@ def download(to_directory=WORKING_DIR) -> None:
         os.makedirs(to_directory)
     with work_in(to_directory):
         if not os.path.exists('./MICADO'):
-            scopesim.download_package(["locations/Armazones",
-                                       "telescopes/ELT",
-                                       "instruments/MICADO"])
+            scopesim.download_package(["locations/Armazones.zip",
+                                       "telescopes/ELT.zip",
+                                       "instruments/MICADO.zip"])
 
 
 def scopesim_grid(N1d: int = 16,
